@@ -47,5 +47,4 @@ COPY app.py .
 # 暴露端口
 EXPOSE 5000
 
-# 使用FastAPI和uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000", "--log-level", "info"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--timeout", "300", "--log-level", "info"]
