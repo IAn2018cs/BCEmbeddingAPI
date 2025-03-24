@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3.10 \
     python3.10-distutils \
     python3.10-dev \
+    python3.10-venv \
     python3-pip \
     wget \
     && rm -rf /var/lib/apt/lists/*
@@ -22,6 +23,10 @@ RUN apt-get update && apt-get install -y \
 # 确保使用Python 3.10
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1 \
     && update-alternatives --set python3 /usr/bin/python3.10
+
+# 创建并激活虚拟环境
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 # 安装pip
 RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && rm get-pip.py
@@ -42,5 +47,5 @@ COPY app.py .
 # 暴露端口
 EXPOSE 5000
 
-# 使用gunicorn启动应用，确保日志输出到标准输出
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--timeout", "300", "--log-level", "info", "--capture-output"]
+# 使用FastAPI和uvicorn
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000", "--log-level", "info"]
