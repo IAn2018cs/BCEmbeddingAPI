@@ -1,3 +1,5 @@
 flask==2.3.2
 gunicorn==23.0.0
+numpy==1.24.4
+torch==2.1.0
 BCEmbedding==0.1.5

@@ -37,6 +37,9 @@ RUN python3 --version
 # 安装PyTorch，兼容CUDA 12.5
 RUN pip3 install torch==2.1.0 --index-url https://download.pytorch.org/whl/cu121
 
+# 安装特定版本的NumPy (1.x)
+RUN pip3 install numpy==1.24.4
+
 # 复制requirements.txt并安装依赖
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
