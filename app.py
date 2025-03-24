@@ -1,8 +1,10 @@
-from flask import Flask, request, jsonify
-from BCEmbedding import EmbeddingModel, RerankerModel
-import os
 import logging
+import os
 import time
+from typing import Optional
+
+from BCEmbedding import EmbeddingModel, RerankerModel
+from flask import Flask, request, jsonify
 
 # 配置日志
 logging.basicConfig(
@@ -15,8 +17,8 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # 初始化模型
-embedding_model = None
-reranker_model = None
+embedding_model: EmbeddingModel = Optional[EmbeddingModel]
+reranker_model: RerankerModel = Optional[RerankerModel]
 models_loaded = False
 
 
@@ -66,16 +68,12 @@ def embed():
 
     data = request.json
 
-    if not data or 'sentences' not in data:
-        return jsonify({"error": "Missing 'sentences' field in request"}), 400
+    if not data or 'input' not in data:
+        return jsonify({"error": "Missing 'input' field in request"}), 400
 
-    sentences = data['sentences']
-
-    if not isinstance(sentences, list):
-        return jsonify({"error": "'sentences' must be a list of strings"}), 400
+    sentences = data['input']
 
     try:
-        logger.info(f"处理embedding请求，句子数量: {len(sentences)}")
         start_time = time.time()
         embeddings = embedding_model.encode(sentences)
         # 将numpy数组转换为列表以便JSON序列化
@@ -96,11 +94,11 @@ def rerank():
 
     data = request.json
 
-    if not data or 'query' not in data or 'passages' not in data:
-        return jsonify({"error": "Missing 'query' or 'passages' field in request"}), 400
+    if not data or 'query' not in data or 'documents' not in data:
+        return jsonify({"error": "Missing 'query' or 'documents' field in request"}), 400
 
     query = data['query']
-    passages = data['passages']
+    passages = data['documents']
 
     if not isinstance(passages, list):
         return jsonify({"error": "'passages' must be a list of strings"}), 400
@@ -110,7 +108,7 @@ def rerank():
         start_time = time.time()
         rerank_results = reranker_model.rerank(query, passages)
         logger.info(f"Rerank处理完成，耗时: {time.time() - start_time:.2f}秒")
-        return jsonify({"reranked_results": rerank_results})
+        return jsonify({"data": rerank_results})
     except Exception as e:
         logger.error(f"Rerank处理出错: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
