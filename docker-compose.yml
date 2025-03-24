@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  bce-service:
+    build: .
+    ports:
+      - "12001:5000"
+    environment:
+      - EMBEDDING_MODEL_PATH=maidalun1020/bce-embedding-base_v1
+      - RERANKER_MODEL_PATH=maidalun1020/bce-reranker-base_v1
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"

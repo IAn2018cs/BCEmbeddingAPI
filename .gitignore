@@ -1,0 +1,14 @@
+/auth/
+.env
+venv
+.venv
+/temp_files/
+/test_case/
+.idea
+*__pycache__/
+/cache/
+/temp
+/cache
+/test/
+/prompt/
+/models
